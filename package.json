@@ -1,7 +1,7 @@
 {
-  "name": "homebridge-philipstv-enhanced-bq2",
-  "version": "0.0.17",
-  "description": "Homebridge module for the Philips TV (with JointSpace enabled) and ready for 2018 models",
+  "name": "homebridge-philipstv-2019",
+  "version": "0.0.1",
+  "description": "Homebridge module for the Philips TV (on SaphirTV OS) with JointSpace enabled and ready for 2019 models",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -25,10 +25,10 @@
     "node": ">=4.3.2",
     "homebridge": ">=0.4.46"
   },
-  "author": "blickfangQ2",
+  "author": "TheAbstractDev",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/blickfangq2/homebridge-philipstv-enhanced/issues"
+    "url": "https://github.com/TheAbstractDev/homebridge-philipstv-2019/issues"
   },
-  "homepage": "https://github.com/blickfangq2/homebridge-philipstv-enhanced#readme"
+  "homepage": "https://github.com/TheAbstractDev/homebridge-philipstv-2019#readme"
 }
