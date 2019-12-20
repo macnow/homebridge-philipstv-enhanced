@@ -519,21 +519,7 @@ HttpStatusAccessory.prototype = {
             .getCharacteristic(Characteristic.RemoteKey)
             .on('set', this.sendKey.bind(this));
 
-        // Next input
-        this.NextInputService = new Service.Switch(this.name + " Next input", '0b');
-        this.NextInputService
-            .getCharacteristic(Characteristic.On)
-            .on('get', this.getNextInput.bind(this))
-            .on('set', this.setNextInput.bind(this));
-
-        // Previous input
-        this.PreviousInputService = new Service.Switch(this.name + " Previous input", '0c');
-        this.PreviousInputService
-            .getCharacteristic(Characteristic.On)
-            .on('get', this.getPreviousInput.bind(this))
-            .on('set', this.setPreviousInput.bind(this));
-
-        this.inputs = Object.entries(this.inputs).map(([id, name]) => {
+        this.tvInputs = Object.entries(this.inputs).map(([id, name]) => {
             const input = new Service.InputSource(name, `inputSource${id}`);
             input
                 .setCharacteristic(Characteristic.Identifier, id)
@@ -543,8 +529,6 @@ HttpStatusAccessory.prototype = {
             this.televisionService.addLinkedService(input);
             return input;
         });
-
-
-        return [informationService, this.televisionService, this.NextInputService, this.PreviousInputService, this.tmpInput];
+        return [informationService, this.televisionService, this.NextInputService, this.PreviousInputService, this.tvInputs];
     }
 };
