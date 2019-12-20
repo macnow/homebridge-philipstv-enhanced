@@ -413,6 +413,9 @@ HttpStatusAccessory.prototype = {
         callback(null, null);
     },
 
+    setInput: function(state, callback, contect) {
+        callback(null, null);
+    },
     getNextInput: function(callback, context) {
         callback(null, null);
     },
@@ -496,7 +499,11 @@ HttpStatusAccessory.prototype = {
 	    this.televisionService
             .setCharacteristic(Characteristic.ConfiguredName, "TV");
 
-        // POWER
+        this.televisionService
+            .getCharacteristic(Characteristic.ActiveIdentifier)
+            .on('set', this.setInput.bind(this));
+        
+            // POWER
         this.televisionService
             .getCharacteristic(Characteristic.Active)
             .on('get', this.getPowerState.bind(this))
@@ -526,51 +533,17 @@ HttpStatusAccessory.prototype = {
             .on('get', this.getPreviousInput.bind(this))
             .on('set', this.setPreviousInput.bind(this));
 
-
-        this.inputIds = new Array();
-        this.inputs.forEach((value, i) => {
-
-            // get appid
-            let id = null;
-
-            if (value.appId !== undefined) {
-                id = value.id;
-            } else {
-                id = value;
-            }
-
-            // get name		
-            let inputName = value.name;
-
-            // if appId not null or empty add the input
-            if (id !== undefined && id !== null && id !== '') {
-                let tmpInput = new Service.InputSource(id, 'inputSource' + i);
-                tmpInput
-                    .setCharacteristic(Characteristic.Identifier, i)
-                    .setCharacteristic(Characteristic.ConfiguredName, inputName)
-                    .setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
-                    .setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.APPLICATION)
-                    .setCharacteristic(Characteristic.CurrentVisibilityState, Characteristic.CurrentVisibilityState.SHOWN);
-
-                tmpInput
-                    .getCharacteristic(Characteristic.ConfiguredName)
-                    .on('set', (name, callback) => {
-                        // savedNames[id] = name;
-                        // fs.writeFile(this.inputNamesFile, JSON.stringify(savedNames), (err) => {
-                        //     if (err) {
-                        //         this.log.debug('webOS - error occured could not write input name %s', err);
-                        //     } else {
-                        //         this.log.debug('webOS - input name successfully saved! New name: %s AppId: %s', name, appId);
-                        //     }
-                        // });
-                        callback()
-                    });
-
-                this.televisionService.addLinkedService(tmpInput);
-                this.inputIds.push(id);
-            }
-
+        this.inputs = Object.entries(this.inputs).map(([id, name]) => {
+            const input = new Service.InputSource(name, `inputSource${id}`);
+            input
+                .setCharacteristic(Characteristic.Identifier, id)
+                .setCharacteristic(Characteristic.ConfiguredName, name)
+                .setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
+                .setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.HDMI);
+            this.televisionService.addLinkedService(input);
+            return input;
         });
+
 
         return [informationService, this.televisionService, this.NextInputService, this.PreviousInputService, this.tmpInput];
     }
