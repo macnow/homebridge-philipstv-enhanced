@@ -22,8 +22,8 @@
     "homebridge-plugin"
   ],
   "engines": {
-    "node": ">=0.12.0",
-    "homebridge": ">=0.2.0"
+    "node": ">=4.3.2",
+    "homebridge": ">=0.4.46"
   },
   "author": "blickfangQ2",
   "license": "ISC",

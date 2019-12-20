@@ -22,10 +22,10 @@ function HttpStatusAccessory(log, config) {
     this.wol_url = config["wol_url"] || "";
     this.model_year_nr = parseInt(this.model_year);
     this.set_attempt = 0;
-    this.has_ssl = config["has_ssl"] || false;
 	this.model_name = config["model_name"];
 	this.model_version = config["model_version"];
-	this.model_serial_no = config["model_serial_no"];
+    this.model_serial_no = config["model_serial_no"];
+    this.inputs = config['inputs'];
 
     // CREDENTIALS FOR API
     this.username = config["username"] || "";
@@ -33,6 +33,9 @@ function HttpStatusAccessory(log, config) {
 
     // CHOOSING API VERSION BY MODEL/YEAR
     switch (this.model_year_nr) {
+        case 2019:
+            this.api_version = 6;
+            break;
         case 2018:
             this.api_version = 6;
             break;
@@ -53,8 +56,8 @@ function HttpStatusAccessory(log, config) {
     }
 
     // CONNECTION SETTINGS
-    this.protocol = this.has_ssl ? "https" : "https";
-    this.portno = this.has_ssl ? "1926" : "1926";
+    this.protocol = "http";
+    this.portno = "1925";
     this.need_authentication = this.username != '' ? 1 : 0;
 
     this.log("Model year: " + this.model_year_nr);
@@ -489,7 +492,6 @@ HttpStatusAccessory.prototype = {
 			.setCharacteristic(Characteristic.FirmwareRevision, this.model_version)
 			.setCharacteristic(Characteristic.SerialNumber, this.model_serial_no);
 
-
         this.televisionService = new Service.Television();
 	    this.televisionService
             .setCharacteristic(Characteristic.ConfiguredName, "TV");
@@ -525,6 +527,51 @@ HttpStatusAccessory.prototype = {
             .on('set', this.setPreviousInput.bind(this));
 
 
-        return [informationService, this.televisionService, this.NextInputService, this.PreviousInputService];
+        this.inputIds = new Array();
+        this.inputs.forEach((value, i) => {
+
+            // get appid
+            let id = null;
+
+            if (value.appId !== undefined) {
+                id = value.id;
+            } else {
+                id = value;
+            }
+
+            // get name		
+            let inputName = value.name;
+
+            // if appId not null or empty add the input
+            if (id !== undefined && id !== null && id !== '') {
+                let tmpInput = new Service.InputSource(id, 'inputSource' + i);
+                tmpInput
+                    .setCharacteristic(Characteristic.Identifier, i)
+                    .setCharacteristic(Characteristic.ConfiguredName, inputName)
+                    .setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
+                    .setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.APPLICATION)
+                    .setCharacteristic(Characteristic.CurrentVisibilityState, Characteristic.CurrentVisibilityState.SHOWN);
+
+                tmpInput
+                    .getCharacteristic(Characteristic.ConfiguredName)
+                    .on('set', (name, callback) => {
+                        // savedNames[id] = name;
+                        // fs.writeFile(this.inputNamesFile, JSON.stringify(savedNames), (err) => {
+                        //     if (err) {
+                        //         this.log.debug('webOS - error occured could not write input name %s', err);
+                        //     } else {
+                        //         this.log.debug('webOS - input name successfully saved! New name: %s AppId: %s', name, appId);
+                        //     }
+                        // });
+                        callback()
+                    });
+
+                this.televisionService.addLinkedService(tmpInput);
+                this.inputIds.push(id);
+            }
+
+        });
+
+        return [informationService, this.televisionService, this.NextInputService, this.PreviousInputService, this.tmpInput];
     }
 };
