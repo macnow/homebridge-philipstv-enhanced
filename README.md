@@ -31,7 +31,7 @@ Added test option for WakeOnWLAN:
             {
                 "id": "hdmi1",
                 "name": "Apple TV"
-                },
+            },
             {
                 "id": "hdmi2",
                 "name": "PS4"
