@@ -1,6 +1,6 @@
 {
   "name": "homebridge-saphir-tv",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Homebridge module for the Philips TV (on SaphirTV OS) with JointSpace enabled and ready for 2019 models",
   "main": "index.js",
   "scripts": {
