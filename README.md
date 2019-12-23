@@ -1,4 +1,4 @@
-# homebridge-saphir-tv
+# homebridge-philips-saphi-tv
 Homebridge module for Philips TV (with JointSpace enabled) with Power on/off, Inputs list & control
 
 # Description
