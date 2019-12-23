@@ -26,6 +26,7 @@ function HttpStatusAccessory(log, config) {
 	this.model_version = config["model_version"];
     this.model_serial_no = config["model_serial_no"];
     this.inputs = config["inputs"];
+    this.activeServices = [];
 
     // CREDENTIALS FOR API
     this.username = config["username"] || "";
@@ -360,8 +361,7 @@ HttpStatusAccessory.prototype = {
     },
 
    /// Next input  -----------------------------------------------------------------------------------------------------------
-    setNextInput: function(inputState, callback, context)
-    {
+    setNextInput: function(inputState, callback, context) {
         this.log.debug("Entering %s with context: %s and target value: %s", arguments.callee.name, context, inputState);
 
         url = this.input_url;
@@ -418,8 +418,7 @@ HttpStatusAccessory.prototype = {
     },
 
    /// Previous input  -----------------------------------------------------------------------------------------------------------
-    setPreviousInput: function(inputState, callback, context)
-    {
+    setPreviousInput: function(inputState, callback, context) {
         this.log.debug("Entering %s with context: %s and target value: %s", arguments.callee.name, context, inputState);
 
         url = this.input_url;
@@ -480,19 +479,19 @@ HttpStatusAccessory.prototype = {
         callback(); // success
     },
 
-    getServices: function()
-    {
-        var that = this;
-
+    configureInformationService: function() {
         var informationService = new Service.AccessoryInformation();
         informationService
             .setCharacteristic(Characteristic.Name, this.name)
             .setCharacteristic(Characteristic.Manufacturer, 'Philips')
             .setCharacteristic(Characteristic.Model, this.model_name)
 			.setCharacteristic(Characteristic.FirmwareRevision, this.model_version)
-			.setCharacteristic(Characteristic.SerialNumber, this.model_serial_no);
+            .setCharacteristic(Characteristic.SerialNumber, this.model_serial_no);
 
+        this.activeServices.push(informationService)
+    },
 
+    configureTelevisionService: function() {
         this.televisionService = new Service.Television();
 	    this.televisionService
             .setCharacteristic(Characteristic.ConfiguredName, "TV");
@@ -513,12 +512,17 @@ HttpStatusAccessory.prototype = {
             .getCharacteristic(Characteristic.RemoteKey)
             .on('set', this.sendKey.bind(this));
 
-        this.tvInputs = Object.entries(this.inputs).map(([id, name]) => {
-            var input = new Service.InputSource(id, `input${id}`);            
+
+        this.activeServices.push(this.televisionService);
+    },
+
+    configureInputSourcesService: function() {
+        this.inputs.forEach((element, index, array) => {
+            var input = new Service.InputSource(element.name, 'inputSource'+ element.id);            
             input
-                .setCharacteristic(Characteristic.Name, name)
-                .setCharacteristic(Characteristic.Identifier, id)
-                .setCharacteristic(Characteristic.ConfiguredName, name)
+                .setCharacteristic(Characteristic.Name, element.name)
+                .setCharacteristic(Characteristic.Identifier, element.id)
+                .setCharacteristic(Characteristic.ConfiguredName, element.name)
                 .setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
                 .setCharacteristic(Characteristic.CurrentVisibilityState, Characteristic.CurrentVisibilityState.SHOWN)
                 .setCharacteristic(Characteristic.TargetVisibilityState, Characteristic.TargetVisibilityState.SHOWN)
@@ -526,23 +530,37 @@ HttpStatusAccessory.prototype = {
                 .setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.HDMI);
 
             this.televisionService.addLinkedService(input);
-            return input;
+            this.activeServices.push(input);
         });
+    },
 
-        // Next input
+    configureNextInputService: function() {
         this.NextInputService = new Service.Switch(this.name + " Next input", '0b');
         this.NextInputService
             .getCharacteristic(Characteristic.On)
             .on('get', this.getNextInput.bind(this))
             .on('set', this.setNextInput.bind(this));
 
-        // Previous input
+        this.activeServices.push(this.NextInputService);
+    },
+
+    configurePreviousInputService: function() {
         this.PreviousInputService = new Service.Switch(this.name + " Previous input", '0c');
         this.PreviousInputService
             .getCharacteristic(Characteristic.On)
             .on('get', this.getPreviousInput.bind(this))
             .on('set', this.setPreviousInput.bind(this));
 
-        return [informationService, this.televisionService, this.NextInputService, this.PreviousInputService, this.tvInputs];
+        this.activeServices.push(this.PreviousInputService);
+    },
+
+    getServices: function() {
+        var that = this;
+        this.configureTelevisionService()
+        this.configureInputSourcesService()
+        this.configureNextInputService()
+        this.configurePreviousInputService()
+        
+        return this.activeServices;
     }
 };
