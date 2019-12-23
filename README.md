@@ -27,6 +27,8 @@ Added test option for WakeOnWLAN:
         "ip_address": "10.0.1.23",
         "poll_status_interval": "60",
         "model_year" : "2019",
+        "model_name": "55OLED754/12",
+        "model_serial_no": "123-456-ABC",
         "wol_url": "wol://18:8e:d5:a2:8c:66"
         "inputs": [
             {
