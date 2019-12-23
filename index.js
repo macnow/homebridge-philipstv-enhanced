@@ -18,14 +18,14 @@ function HttpStatusAccessory(log, config) {
     this.ip_address = config["ip_address"];
     this.name = config["name"];
     this.poll_status_interval = config["poll_status_interval"] || "0";
-    this.model_year = config["model_year"] || "2018";
+    this.model_year = config["model_year"];
     this.wol_url = config["wol_url"] || "";
     this.model_year_nr = parseInt(this.model_year);
     this.set_attempt = 0;
 	this.model_name = config["model_name"];
 	this.model_version = config["model_version"];
     this.model_serial_no = config["model_serial_no"];
-    this.inputs = config['inputs'];
+    this.inputs = config["inputs"];
 
     // CREDENTIALS FOR API
     this.username = config["username"] || "";
@@ -56,8 +56,8 @@ function HttpStatusAccessory(log, config) {
     }
 
     // CONNECTION SETTINGS
-    this.protocol = "http";
-    this.portno = "1925";
+    this.protocol = "http"
+    this.portno = "1925"
     this.need_authentication = this.username != '' ? 1 : 0;
 
     this.log("Model year: " + this.model_year_nr);
@@ -413,9 +413,6 @@ HttpStatusAccessory.prototype = {
         callback(null, null);
     },
 
-    setInput: function(state, callback, contect) {
-        callback(null, null);
-    },
     getNextInput: function(callback, context) {
         callback(null, null);
     },
@@ -495,15 +492,12 @@ HttpStatusAccessory.prototype = {
 			.setCharacteristic(Characteristic.FirmwareRevision, this.model_version)
 			.setCharacteristic(Characteristic.SerialNumber, this.model_serial_no);
 
+
         this.televisionService = new Service.Television();
 	    this.televisionService
             .setCharacteristic(Characteristic.ConfiguredName, "TV");
 
-        this.televisionService
-            .getCharacteristic(Characteristic.ActiveIdentifier)
-            .on('set', this.setInput.bind(this));
-        
-            // POWER
+        // POWER
         this.televisionService
             .getCharacteristic(Characteristic.Active)
             .on('get', this.getPowerState.bind(this))
@@ -520,17 +514,35 @@ HttpStatusAccessory.prototype = {
             .on('set', this.sendKey.bind(this));
 
         this.tvInputs = Object.entries(this.inputs).map(([id, name]) => {
-            var input = new Service.InputSource(id, `inputSource${id}`);            
+            var input = new Service.InputSource(id, `input${id}`);            
             input
+                .setCharacteristic(Characteristic.Name, name)
                 .setCharacteristic(Characteristic.Identifier, id)
                 .setCharacteristic(Characteristic.ConfiguredName, name)
                 .setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
-                .setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.HDMI)
                 .setCharacteristic(Characteristic.CurrentVisibilityState, Characteristic.CurrentVisibilityState.SHOWN)
+                .setCharacteristic(Characteristic.TargetVisibilityState, Characteristic.TargetVisibilityState.SHOWN)
+                .setCharacteristic(Characteristic.InputDeviceType, Characteristic.InputDeviceType.TV)
+                .setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.HDMI);
 
             this.televisionService.addLinkedService(input);
             return input;
         });
+
+        // Next input
+        this.NextInputService = new Service.Switch(this.name + " Next input", '0b');
+        this.NextInputService
+            .getCharacteristic(Characteristic.On)
+            .on('get', this.getNextInput.bind(this))
+            .on('set', this.setNextInput.bind(this));
+
+        // Previous input
+        this.PreviousInputService = new Service.Switch(this.name + " Previous input", '0c');
+        this.PreviousInputService
+            .getCharacteristic(Characteristic.On)
+            .on('get', this.getPreviousInput.bind(this))
+            .on('set', this.setPreviousInput.bind(this));
+
         return [informationService, this.televisionService, this.NextInputService, this.PreviousInputService, this.tvInputs];
     }
 };
