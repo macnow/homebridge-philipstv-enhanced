@@ -7,7 +7,7 @@ var wol = require('wake_on_lan');
 module.exports = function(homebridge) {
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
-    homebridge.registerAccessory("homebridge-philipstv-enhanced", "PhilipsTV", HttpStatusAccessory);
+    homebridge.registerAccessory("homebridge-philipstv-2019", "PhilipsTV", HttpStatusAccessory);
 }
 
 function HttpStatusAccessory(log, config) {
@@ -520,12 +520,14 @@ HttpStatusAccessory.prototype = {
             .on('set', this.sendKey.bind(this));
 
         this.tvInputs = Object.entries(this.inputs).map(([id, name]) => {
-            const input = new Service.InputSource(name, `inputSource${id}`);
+            var input = new Service.InputSource(id, `inputSource${id}`);            
             input
                 .setCharacteristic(Characteristic.Identifier, id)
                 .setCharacteristic(Characteristic.ConfiguredName, name)
                 .setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
-                .setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.HDMI);
+                .setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.HDMI)
+                .setCharacteristic(Characteristic.CurrentVisibilityState, Characteristic.CurrentVisibilityState.SHOWN)
+
             this.televisionService.addLinkedService(input);
             return input;
         });
