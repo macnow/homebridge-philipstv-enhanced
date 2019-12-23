@@ -1,4 +1,4 @@
-# homebridge-philipstv-2019
+# homebridge-saphir-tv
 Homebridge module for Philips TV (with JointSpace enabled) with Power on/off, Inputs list & control
 
 # Description
@@ -22,7 +22,7 @@ Added test option for WakeOnWLAN:
  ```
 "accessories": [
     {
-        "accessory": "PhilipsTV",
+        "accessory": "PhilipsSaphirTV",
         "name": "TV",
         "ip_address": "10.0.1.23",
         "poll_status_interval": "60",
