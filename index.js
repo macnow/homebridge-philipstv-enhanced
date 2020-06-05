@@ -378,7 +378,7 @@ HttpStatusAccessory.prototype = {
 
                 setTimeout(function ()
                 {
-                    body = JSON.stringify({"key": "CursorDown"});
+                    body = JSON.stringify({"key": "CursorRight"});
 
                     this.httpRequest(url, body, "POST", this.need_authentication, function(error, response, responseBody)
                     {
@@ -435,7 +435,7 @@ HttpStatusAccessory.prototype = {
 
                 setTimeout(function ()
                 {
-                    body = JSON.stringify({"key": "CursorUp"});
+                    body = JSON.stringify({"key": "CursorLeft"});
 
                     this.httpRequest(url, body, "POST", this.need_authentication, function(error, response, responseBody)
                     {
