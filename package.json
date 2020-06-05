@@ -1,14 +1,14 @@
 {
-  "name": "homebridge-philipstv-enhanced",
-  "version": "0.1.1",
-  "description": "Homebridge module for the Philips TV (with JointSpace enabled) and ready for 2018 models",
+  "name": "homebridge-saphir-tv",
+  "version": "0.0.2",
+  "description": "Homebridge module for the Philips TV (on SaphirTV OS) with JointSpace enabled and ready for 2019 models",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jebabin/homebridge-philipstv-enhanced.git"
+    "url": "git+https://github.com/TheAbstractDev/homebridge-saphir-tv.git"
   },
   "dependencies": {
     "polling-to-event": "^2.0.2",
@@ -22,13 +22,14 @@
     "homebridge-plugin"
   ],
   "engines": {
-    "node": ">=0.12.0",
-    "homebridge": ">=0.2.0"
+    "node": ">=4.3.2",
+    "homebridge": ">=0.4.46"
   },
-  "author": "jebabin",
+  "author": "TheAbstractDev",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/jebabin/homebridge-philipstv-enhanced/issues"
+    "url": "https://github.com/TheAbstractDev/homebridge-saphir-tv/issues"
   },
-  "homepage": "https://github.com/jebabin/homebridge-philipstv-enhanced#readme"
+  "homepage": "https://github.com/TheAbstractDev/homebridge-saphir-tv#readme",
+  "devDependencies": {}
 }
